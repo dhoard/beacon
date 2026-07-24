@@ -10,6 +10,8 @@
     <modules>
         <module>beacon</module>
         <module>examples/openai-sdk-example</module>
+        <module>examples/claude-sdk-example</module>
+        <module>examples/gemini-sdk-example</module>
     </modules>
 
     <properties>

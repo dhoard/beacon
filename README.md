@@ -2,15 +2,17 @@
 
 > A lightweight Java mock server for testing LLM applications.
 
-Beacon allows you to test AI-powered Java applications without making real API calls. It provides a fluent API to define deterministic responses while remaining compatible with the official OpenAI Java SDK.
+Beacon allows you to test AI-powered Java applications without making real API calls. It provides a fluent API to define deterministic responses while remaining compatible with the official Java SDKs of leading LLM providers.
 
 ## Features
 
-* Embedded mock AI server
-* Compatible with the official OpenAI Java SDK
-* Rule-based response matching
-* Fluent Java API
-* Fast local testing without external API calls
+- Embedded mock AI server
+- Compatible with the official OpenAI Java SDK
+- Compatible with the official Anthropic (Claude) Java SDK
+- Compatible with the official Google Gemini Java SDK
+- Rule-based response matching
+- Fluent Java API
+- Fast local testing without external API calls
 
 ## Installation
 
@@ -42,7 +44,7 @@ Add the Beacon dependency:
 Create and start a mock server.
 
 ```java
-import static io.beacon.matchers.PromptMatchers.*;
+import static io.beacon.PromptMatchers.*;
 
 MockAIServer server = new MockAIServer();
 
@@ -55,9 +57,19 @@ server.when(any())
 server.start();
 ```
 
-## Using with the OpenAI Java SDK
+## Supported SDKs
 
-Point the OpenAI client to Beacon instead of the OpenAI API.
+Beacon currently supports the official Java SDKs for:
+
+- OpenAI
+- Anthropic (Claude)
+- Google Gemini
+
+Simply configure your SDK to use Beacon's base URL instead of the provider's API endpoint.
+
+## Example
+
+### OpenAI
 
 ```java
 OpenAIClient client = OpenAIOkHttpClient.builder()
@@ -66,25 +78,27 @@ OpenAIClient client = OpenAIOkHttpClient.builder()
         .build();
 ```
 
-Now any request sent through the SDK will be handled by Beacon.
+### Claude
 
 ```java
-ChatCompletion chatCompletion = client.chat().completions().create(request);
-
-String response = chatCompletion.choices()
-        .getFirst()
-        .message()
-        .content()
-        .orElse("");
-
-System.out.println(response);
+AnthropicClient client = AnthropicOkHttpClient.builder()
+        .baseUrl(server.getBaseUrl())
+        .apiKey("dummy-key")
+        .build();
 ```
 
-Output:
+### Gemini
 
-```text
-Refunds are processed within 30 days.
+```java
+Client client = Client.builder()
+        .apiKey("dummy-key")
+        .httpOptions(HttpOptions.builder()
+                .baseUrl(server.getBaseUrl())
+                .build())
+        .build();
 ```
+
+After configuring the client, use the SDK normally. Beacon intercepts the requests and returns your mocked responses.
 
 ## Matchers
 
@@ -102,23 +116,27 @@ server.when(any())
       .respondWith("I don't know.");
 ```
 
-## Example
+## Examples
 
-A complete working example is available in:
+Complete working examples are available in:
 
 ```text
 examples/openai-sdk-example
+examples/claude-sdk-example
+examples/gemini-sdk-example
 ```
 
 ## Roadmap
 
-* ✅ OpenAI Java SDK support
-* ⏳ Claude support
-* ⏳ Gemini support
-* ⏳ Additional matchers
-* ⏳ Streaming responses
-* ⏳ Scenario testing
-* ⏳ Request verification
+- ✅ OpenAI Java SDK support
+- ✅ Anthropic (Claude) Java SDK support
+- ✅ Google Gemini Java SDK support
+- ⏳ Streaming responses
+- ⏳ Additional matchers
+- ⏳ Request verification
+- ⏳ Scenario testing
+- ⏳ Tool/function calling support
+- ⏳ Embeddings support
 
 ## Contributing
 
