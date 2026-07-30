@@ -2,17 +2,18 @@
 
 > A lightweight Java mock server for testing LLM applications.
 
-Beacon allows you to test AI-powered Java applications without making real API calls. It provides a fluent API to define deterministic responses while remaining compatible with the official Java SDKs of leading LLM providers.
+Beacon allows you to test AI-powered Java applications without making real API calls. It provides a fluent API to define deterministic responses and simulate common LLM failures while remaining compatible with the official Java SDKs of leading LLM providers.
 
 ## Features
 
-- Embedded mock AI server
-- Compatible with the official OpenAI Java SDK
-- Compatible with the official Anthropic (Claude) Java SDK
-- Compatible with the official Google Gemini Java SDK
-- Rule-based response matching
-- Fluent Java API
-- Fast local testing without external API calls
+* Embedded mock AI server
+* Compatible with the official OpenAI Java SDK
+* Compatible with the official Anthropic (Claude) Java SDK
+* Compatible with the official Google Gemini Java SDK
+* Rule-based response matching
+* Fluent Java API
+* Fault injection for testing LLM response handling
+* Fast local testing without external API calls
 
 ## Installation
 
@@ -35,7 +36,7 @@ Add the Beacon dependency:
 <dependency>
     <groupId>com.github.kbpramod</groupId>
     <artifactId>beacon</artifactId>
-    <version>v0.0.1</version>
+    <version>v0.0.2</version>
 </dependency>
 ```
 
@@ -57,17 +58,73 @@ server.when(any())
 server.start();
 ```
 
+## Fault Injection
+
+Beacon can simulate common LLM output issues to help validate your application's response handling.
+
+### Empty Response
+
+```java
+server.when(any())
+      .respondWith("Hello")
+      .respondFault(Fault.emptyResponse());
+```
+
+### Invalid JSON
+
+```java
+server.when(any())
+      .respondWith("""
+          {
+            "result": true
+          }
+          """)
+      .respondFault(Fault.invalidJson());
+```
+
+### Truncated JSON
+
+```java
+server.when(any())
+      .respondWith("""
+          {
+            "result": true
+          }
+          """)
+      .respondFault(Fault.truncatedJson());
+```
+
+### Markdown JSON
+
+```java
+server.when(any())
+      .respondWith("""
+          {
+            "result": true
+          }
+          """)
+      .respondFault(Fault.markdownJson());
+```
+
+### Supported Faults
+
+* `Fault.none()`
+* `Fault.emptyResponse()`
+* `Fault.invalidJson()`
+* `Fault.truncatedJson()`
+* `Fault.markdownJson()`
+
 ## Supported SDKs
 
 Beacon currently supports the official Java SDKs for:
 
-- OpenAI
-- Anthropic (Claude)
-- Google Gemini
+* OpenAI
+* Anthropic (Claude)
+* Google Gemini
 
 Simply configure your SDK to use Beacon's base URL instead of the provider's API endpoint.
 
-## Example
+## SDK Configuration
 
 ### OpenAI
 
@@ -98,7 +155,7 @@ Client client = Client.builder()
         .build();
 ```
 
-After configuring the client, use the SDK normally. Beacon intercepts the requests and returns your mocked responses.
+After configuring the client, use the SDK normally. Beacon intercepts requests and returns the mocked responses.
 
 ## Matchers
 
@@ -106,7 +163,7 @@ After configuring the client, use the SDK normally. Beacon intercepts the reques
 
 ```java
 server.when(contains("refund"))
-      .respondWith("30 day refund policy.");
+      .respondWith("Refunds are processed within 30 days.");
 ```
 
 ### Default Matcher
@@ -128,15 +185,32 @@ examples/gemini-sdk-example
 
 ## Roadmap
 
-- ✅ OpenAI Java SDK support
-- ✅ Anthropic (Claude) Java SDK support
-- ✅ Google Gemini Java SDK support
-- ⏳ Streaming responses
-- ⏳ Additional matchers
-- ⏳ Request verification
-- ⏳ Scenario testing
-- ⏳ Tool/function calling support
-- ⏳ Embeddings support
+### v0.0.1
+
+* ✅ Embedded mock server
+* ✅ Rule-based response matching
+* ✅ OpenAI Java SDK support
+* ✅ Anthropic Java SDK support
+* ✅ Google Gemini Java SDK support
+
+### v0.0.2
+
+* ✅ Fault injection
+* ✅ Empty response simulation
+* ✅ Invalid JSON simulation
+* ✅ Truncated JSON simulation
+* ✅ Markdown JSON simulation
+
+### Planned
+
+* ⏳ JUnit 5 integration
+* ⏳ Fault test suites
+* ⏳ Streaming responses
+* ⏳ Additional matchers
+* ⏳ Request verification
+* ⏳ Scenario testing
+* ⏳ Tool/function calling support
+* ⏳ Embeddings support
 
 ## Contributing
 
