@@ -5,6 +5,7 @@ import io.beacon.match.PromptMatcher;
 import io.beacon.router.RequestRouter;
 import io.beacon.rules.Rule;
 import io.beacon.rules.RuleEngine;
+import io.beacon.testing.FaultHandler;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -47,8 +48,9 @@ public class MockAIServer {
         return new WhenBuilder(this, matcher);
     }
 
-    public void addRule(PromptMatcher prompt, String response) {
-        ruleEngine.addRule(prompt, response);
+    public Rule addRule(PromptMatcher prompt, String response) {
+        Rule rule = ruleEngine.addRule(prompt, response);
+        return rule;
     }
 }
 

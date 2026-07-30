@@ -46,28 +46,30 @@ public class ClaudeRequestHandler implements RequestHandler {
         String content = "I'm your mock AI assistant. No matching rule was found for this request.";
         Rule rule = RuleEngine.findMatchingRule(prompt);
         if(rule != null) {
-            content = rule.response();
+            content = rule.getFault().apply(rule.getResponse());
         }
 
+        String escapedContent = mapper.writeValueAsString(content);
+
         String response = """
-{
-  "id": "msg_123",
-  "type": "message",
-  "role": "assistant",
-  "model": "claude-sonnet-4-20250514",
-  "content": [
-    {
-      "type": "text",
-      "text": "%s"
-    }
-  ],
-  "stop_reason": "end_turn",
-  "stop_sequence": null,
-  "usage": {
-    "input_tokens": 10,
-    "output_tokens": 8
-  }
-}""".formatted(content);
+            {
+              "id": "msg_123",
+              "type": "message",
+              "role": "assistant",
+              "model": "claude-sonnet-4-20250514",
+              "content": [
+                {
+                  "type": "text",
+                  "text": %s
+                }
+              ],
+              "stop_reason": "end_turn",
+              "stop_sequence": null,
+              "usage": {
+                "input_tokens": 10,
+                "output_tokens": 8
+              }
+            }""".formatted(escapedContent);
 
         byte[] bytes = response.getBytes(StandardCharsets.UTF_8);
 

@@ -1,6 +1,8 @@
 package io.beacon.rules;
 
+import io.beacon.Fault;
 import io.beacon.match.PromptMatcher;
+import io.beacon.testing.FaultHandler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,8 +11,10 @@ public class RuleEngine {
 
     private static final List<Rule> rules = new ArrayList<>();
 
-    public void addRule(PromptMatcher matcher, String response) {
-        rules.add(new Rule(matcher, response));
+    public Rule addRule(PromptMatcher matcher, String response) {
+        Rule rule = new Rule(matcher, response);
+        rules.add(rule);
+        return rule;
     }
 
     public static Rule findMatchingRule(String prompt) {
@@ -21,12 +25,12 @@ public class RuleEngine {
 
             Rule rule = rules.get(i);
 
-            if (!rule.matcher().matches(prompt)) {
+            if (!rule.getMatcher().matches(prompt)) {
                 continue;
             }
 
             if (bestRule == null ||
-                    rule.matcher().priority() > bestRule.matcher().priority()) {
+                    rule.getMatcher().priority() > bestRule.getMatcher().priority()) {
                 bestRule = rule;
             }
         }

@@ -18,13 +18,15 @@ public class Main {
         server.start();
 
         server.when(contains("refund"))
-                .respondWith("Your refund policy is you get you full refund after deducting 30% for charge");
+                .respondWith("Your refund policy is you get you full refund after deducting 30% for charge")
+                        .respondFault(Fault.truncatedJson());
 
         server.when(contains("weather"))
                 .respondWith("Today's weather is sunny.");
 
         server.when(any())
-                .respondWith("I don't know the answer.");
+                .respondWith("{\"result\": \"true\"}")
+                .respondFault(Fault.markdownJson());
 
         OpenAIClient client = OpenAIOkHttpClient.builder()
                 .apiKey("sk-test")
@@ -34,7 +36,7 @@ public class Main {
         ChatCompletionCreateParams params =
                 ChatCompletionCreateParams.builder()
                         .model(ChatModel.GPT_4_1)
-                        .addUserMessage("What is the?")
+                        .addUserMessage("What is the policy?")
                         .build();
 
         ChatCompletion completion =

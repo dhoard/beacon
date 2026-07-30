@@ -12,6 +12,7 @@
         <module>examples/openai-sdk-example</module>
         <module>examples/claude-sdk-example</module>
         <module>examples/gemini-sdk-example</module>
+        <module>src</module>
     </modules>
 
     <properties>

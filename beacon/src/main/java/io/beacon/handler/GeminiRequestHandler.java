@@ -48,8 +48,10 @@ public class GeminiRequestHandler implements RequestHandler {
         String content = "I'm your mock AI assistant. No matching rule was found for this request.";
         Rule rule = RuleEngine.findMatchingRule(prompt);
         if(rule != null) {
-            content = rule.response();
+            content = rule.getFault().apply(rule.getResponse());
         }
+
+        String escapedContent = mapper.writeValueAsString(content);
 
         String response = """
 {
@@ -59,7 +61,7 @@ public class GeminiRequestHandler implements RequestHandler {
         "role": "model",
         "parts": [
           {
-            "text": "%s"
+            "text": %s
           }
         ]
       },
@@ -67,7 +69,7 @@ public class GeminiRequestHandler implements RequestHandler {
       "index": 0
     }
   ]
-}""".formatted(content);
+}""".formatted(escapedContent);
 
         byte[] bytes = response.getBytes(StandardCharsets.UTF_8);
 
